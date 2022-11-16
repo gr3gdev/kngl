@@ -1,7 +1,15 @@
 headers = GL/glew.h
 headerFilter = GL/*
 package = platform.glew
+
 compilerOpts.osx = -I/usr/include -I/usr/local/include
 linkerOpts.osx = -L/usr/lib -L/usr/local/lib -lGL -lGLEW
+
 compilerOpts.linux = -I/usr/include -I/usr/local/include
 linkerOpts.linux = -L/usr/lib/x86_64-linux-gnu -lGL -lGLEW
+
+headers.mingw = GL/glew.h GL/wglew.h
+staticLibraries.mingw = libglew32.a glew32.dll
+libraryPaths.mingw = C:\\mingw64\\x86_64-w64-mingw32\\lib C:\\mingw64\\x86_64-w64-mingw32\\bin
+compilerOpts.mingw = -IC:\\mingw64\\x86_64-w64-mingw32\\include -IC:\\mingw64\\x86_64-w64-mingw32\\bin
+linkerOpts.mingw = -LC:\\mingw64\\x86_64-w64-mingw32\\lib -LC:\\mingw64\\x86_64-w64-mingw32\\bin -lopengl32 -lglew32
