@@ -1,3 +1,5 @@
+import org.gradle.kotlin.dsl.support.unzipTo
+
 plugins {
     kotlin("multiplatform") version "1.7.20"
 }
@@ -41,12 +43,72 @@ kotlin {
     }
 }
 
+val glfwVersion = "3.3.8"
+val glewVersion = "2.1.0"
+
+fun download(url: String, dest: String) {
+    ant.withGroovyBuilder {
+        "get"("src" to url, "dest" to dest)
+    }
+}
+
+fun buildSources(sourcePath: String, destPath: String) {
+    exec {
+        workingDir(sourcePath)
+        commandLine("cmake", "-S .", "-B .", "-DCMAKE_INSTALL_PREFIX=$destPath")
+    }
+    exec {
+        workingDir(sourcePath)
+        commandLine("make")
+        commandLine("make", "install")
+    }
+}
+
 tasks {
-    register("copyDlls", Copy::class) {
-        from("C:\\mingw64\\x86_64-w64-mingw32\\bin") {
-            include("glew32.dll")
-            include("glfw3.dll")
-        }
-        into("build\\bin\\releaseExecutable")
+    register("installGLFW") {
+        download(
+            "https://github.com/glfw/glfw/releases/download/$glfwVersion/glfw-$glfwVersion.zip",
+            "build/glfw.zip"
+        )
+        unzipTo(File("build"), File("build/glfw.zip"))
+        buildSources(
+            "build/glfw-$glfwVersion",
+            "${project.file("lib").absolutePath}/glfw"
+        )
+    }
+
+    register("installGLFWForWindows") {
+        download(
+            "https://github.com/glfw/glfw/releases/download/$glfwVersion/glfw-$glfwVersion.bin.WIN64.zip",
+            "build/glfwWindows.zip"
+        )
+        unzipTo(File("lib"), File("build/glfwWindows.zip"))
+    }
+
+    register("installGLEW") {
+        download(
+            "https://freefr.dl.sourceforge.net/project/glew/glew/$glewVersion/glew-$glewVersion.zip",
+            "build/glew.zip"
+        )
+        unzipTo(File("build"), File("build/glew.zip"))
+        buildSources(
+            "build/glew-$glewVersion/build/cmake",
+            "${project.file("lib").absolutePath}/glew"
+        )
+    }
+
+    register("installGLEWForWindows") {
+        download(
+            "https://freefr.dl.sourceforge.net/project/glew/glew/$glewVersion/glew-$glewVersion-win32.zip",
+            "build/glewWindows.zip"
+        )
+        unzipTo(File("lib"), File("build/glewWindows.zip"))
+    }
+
+    register("initOpenGL") {
+        //dependsOn("installGLFW")
+        dependsOn("installGLFWForWindows")
+        //dependsOn("installGLEW")
+        dependsOn("installGLEWForWindows")
     }
 }

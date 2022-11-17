@@ -1,4 +1,4 @@
-headers = GLFW/glfw3.h
+headers = GLFW/glfw3.h GLFW/glfw3native.h
 headerFilter = GLFW/*
 package = platform.glfw
 
@@ -8,8 +8,7 @@ linkerOpts.osx = -L/usr/lib -L/usr/local/lib -lglfw
 compilerOpts.linux = -I/usr/include -I/usr/local/include
 linkerOpts.linux = -L/usr/lib/x86_64-linux-gnu -lglfw
 
-headers.mingw = GLFW/glfw3.h GLFW/glfw3native.h
-staticLibraries.mingw = libglfw3.a libgdi32.a glfw3.dll
-libraryPaths.mingw = C:\\mingw64\\x86_64-w64-mingw32\\lib C:\\mingw64\\x86_64-w64-mingw32\\bin
-compilerOpts.mingw = -IC:\\mingw64\\x86_64-w64-mingw32\\include -IC:\\mingw64\\x86_64-w64-mingw32\\bin
-linkerOpts.mingw = -LC:\\mingw64\\x86_64-w64-mingw32\\lib -LC:\\mingw64\\x86_64-w64-mingw32\\bin -lgdi32 -lopengl32 -lglfw3
+staticLibraries.mingw = libglfw3.a glfw3.dll
+libraryPaths.mingw = ./lib/glfw-3.3.8.bin.WIN64/lib-mingw-w64
+compilerOpts.mingw = -I ./lib/glfw-3.3.8.bin.WIN64/include
+linkerOpts.mingw = -L ./lib/glfw-3.3.8.bin.WIN64/lib-mingw-w64 -lgdi32 -lopengl32 -lglfw3

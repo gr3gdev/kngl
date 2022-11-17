@@ -9,7 +9,7 @@ compilerOpts.linux = -I/usr/include -I/usr/local/include
 linkerOpts.linux = -L/usr/lib/x86_64-linux-gnu -lGL -lGLEW
 
 headers.mingw = GL/glew.h GL/wglew.h
-staticLibraries.mingw = libglew32.a glew32.dll
-libraryPaths.mingw = C:\\mingw64\\x86_64-w64-mingw32\\lib C:\\mingw64\\x86_64-w64-mingw32\\bin
-compilerOpts.mingw = -IC:\\mingw64\\x86_64-w64-mingw32\\include -IC:\\mingw64\\x86_64-w64-mingw32\\bin
-linkerOpts.mingw = -LC:\\mingw64\\x86_64-w64-mingw32\\lib -LC:\\mingw64\\x86_64-w64-mingw32\\bin -lopengl32 -lglew32
+staticLibraries.mingw = glew32.dll
+libraryPaths.mingw = ./lib/glew-2.1.0/bin/Release/x64
+compilerOpts.mingw = -I ./lib/glew-2.1.0/include
+linkerOpts.mingw = -L ./lib/glew-2.1.0/bin/Release/x64 -lopengl32 -lglew32
