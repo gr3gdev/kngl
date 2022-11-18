@@ -7,6 +7,8 @@ plugins {
 group = "com.github.gr3gdev"
 version = "1.0-SNAPSHOT"
 
+val korimVersion = "2.2.0"
+
 repositories {
     mavenCentral()
 }
@@ -24,10 +26,18 @@ kotlin {
         compilations.getByName("main") {
             cinterops {
                 val glew by creating {
-                    defFile(project.file("src/nativeInterop/cinterop/glew.def"))
+                    if (isMingwX64) {
+                        defFile(project.file("src/nativeInterop/cinterop/glew-windows.def"))
+                    } else {
+                        defFile(project.file("src/nativeInterop/cinterop/glew.def"))
+                    }
                 }
                 val glfw by creating {
-                    defFile(project.file("src/nativeInterop/cinterop/glfw.def"))
+                    if (isMingwX64) {
+                        defFile(project.file("src/nativeInterop/cinterop/glfw-windows.def"))
+                    } else {
+                        defFile(project.file("src/nativeInterop/cinterop/glfw.def"))
+                    }
                 }
             }
         }
@@ -39,76 +49,53 @@ kotlin {
     }
     sourceSets {
         val commonMain by getting
-        val commonTest by getting
+        val commonTest by getting {
+            dependencies {
+                implementation("com.soywiz.korlibs.korim:korim:$korimVersion")
+            }
+        }
     }
 }
 
 val glfwVersion = "3.3.8"
 val glewVersion = "2.1.0"
 
-fun download(url: String, dest: String) {
+fun download(url: String, dest: File) {
+    if (!dest.parentFile.exists()) {
+        dest.parentFile.mkdirs()
+    }
     ant.withGroovyBuilder {
         "get"("src" to url, "dest" to dest)
     }
 }
 
-fun buildSources(sourcePath: String, destPath: String) {
-    exec {
-        workingDir(sourcePath)
-        commandLine("cmake", "-S .", "-B .", "-DCMAKE_INSTALL_PREFIX=$destPath")
-    }
-    exec {
-        workingDir(sourcePath)
-        commandLine("make")
-        commandLine("make", "install")
-    }
-}
-
 tasks {
-    register("installGLFW") {
-        download(
-            "https://github.com/glfw/glfw/releases/download/$glfwVersion/glfw-$glfwVersion.zip",
-            "build/glfw.zip"
-        )
-        unzipTo(File("build"), File("build/glfw.zip"))
-        buildSources(
-            "build/glfw-$glfwVersion",
-            "${project.file("lib").absolutePath}/glfw"
-        )
-    }
-
     register("installGLFWForWindows") {
-        download(
-            "https://github.com/glfw/glfw/releases/download/$glfwVersion/glfw-$glfwVersion.bin.WIN64.zip",
-            "build/glfwWindows.zip"
-        )
-        unzipTo(File("lib"), File("build/glfwWindows.zip"))
-    }
-
-    register("installGLEW") {
-        download(
-            "https://freefr.dl.sourceforge.net/project/glew/glew/$glewVersion/glew-$glewVersion.zip",
-            "build/glew.zip"
-        )
-        unzipTo(File("build"), File("build/glew.zip"))
-        buildSources(
-            "build/glew-$glewVersion/build/cmake",
-            "${project.file("lib").absolutePath}/glew"
-        )
+        doFirst {
+            download(
+                "https://github.com/glfw/glfw/releases/download/$glfwVersion/glfw-$glfwVersion.bin.WIN64.zip",
+                project.file("build/glfwWindows.zip")
+            )
+        }
+        doLast {
+            unzipTo(project.file("lib"), project.file("build/glfwWindows.zip"))
+        }
     }
 
     register("installGLEWForWindows") {
-        download(
-            "https://freefr.dl.sourceforge.net/project/glew/glew/$glewVersion/glew-$glewVersion-win32.zip",
-            "build/glewWindows.zip"
-        )
-        unzipTo(File("lib"), File("build/glewWindows.zip"))
+        doFirst {
+            download(
+                "https://freefr.dl.sourceforge.net/project/glew/glew/$glewVersion/glew-$glewVersion-win32.zip",
+                project.file("build/glewWindows.zip")
+            )
+        }
+        doLast {
+            unzipTo(project.file("lib"), project.file("build/glewWindows.zip"))
+        }
     }
 
     register("initOpenGL") {
-        //dependsOn("installGLFW")
         dependsOn("installGLFWForWindows")
-        //dependsOn("installGLEW")
         dependsOn("installGLEWForWindows")
     }
 }

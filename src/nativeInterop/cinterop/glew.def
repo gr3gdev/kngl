@@ -7,9 +7,3 @@ linkerOpts.osx = -L/usr/lib -L/usr/local/lib -lGL -lGLEW
 
 compilerOpts.linux = -I/usr/include -I/usr/local/include
 linkerOpts.linux = -L/usr/lib/x86_64-linux-gnu -lGL -lGLEW
-
-headers.mingw = GL/glew.h GL/wglew.h
-staticLibraries.mingw = glew32.dll
-libraryPaths.mingw = ./lib/glew-2.1.0/bin/Release/x64
-compilerOpts.mingw = -I ./lib/glew-2.1.0/include
-linkerOpts.mingw = -L ./lib/glew-2.1.0/bin/Release/x64 -lopengl32 -lglew32

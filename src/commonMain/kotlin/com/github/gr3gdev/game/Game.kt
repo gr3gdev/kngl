@@ -6,6 +6,8 @@ import platform.glfw.*
 
 class Game {
 
+    private var forceStopped = false
+
     init {
         if (glfwInit() == GLFW_FALSE) {
             throw Error("Failed to initialize GLFW")
@@ -43,6 +45,44 @@ class Game {
     }
 
     fun start() {
+        this.start(
+            """attribute vec4 a_position;
+attribute vec4 a_color;
+attribute vec2 a_texCoord;
+
+uniform mat4 u_projTrans;
+
+varying vec4 v_color;
+varying vec2 v_texCoords;
+
+void main()
+{
+    v_color = a_color;
+    v_color.a = v_color.a * (256.0/255.0);
+    v_texCoords = a_texCoord + 0;
+    gl_Position =  u_projTrans * a_position;
+}
+""".trimIndent(), """#ifdef GL_ES
+#define LOWP lowp
+    precision mediump float;
+#else
+    #define LOWP
+#endif
+
+varying LOWP vec4 v_color;
+varying vec2 v_texCoords;
+
+uniform sampler2D u_texture;
+
+void main()
+{
+    gl_FragColor = v_color * texture2D(u_texture, v_texCoords);
+}
+""".trimIndent()
+        )
+    }
+
+    fun start(vertexShader: String, fragmentShader: String) {
         val width = 400
         val height = 300
 
@@ -86,22 +126,13 @@ class Game {
             )
         }
 
-        val pId = compileShaderProgram(
-            """#version 410 core
-layout(location = 0) in vec3 vertexPosition_modelspace;
-void main() {
-  gl_Position.xyz = vertexPosition_modelspace;
-  gl_Position.w = 1.0;
-}
-""".trimIndent(), """#version 410 core
-out vec3 color;
-void main(){
-  color = vec3(1,0,0);
-}
-""".trimIndent()
-        )
+        val pId = compileShaderProgram(vertexShader, fragmentShader)
 
-        while (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS && glfwWindowShouldClose(window) == 0) {
+        while (glfwGetKey(
+                window,
+                GLFW_KEY_ESCAPE
+            ) != GLFW_PRESS && glfwWindowShouldClose(window) == 0 && !forceStopped
+        ) {
             glClear(GL_COLOR_BUFFER_BIT.toUInt() or GL_DEPTH_BUFFER_BIT.toUInt())
             glClearColor(0f, 0f, 0f, 1f)
 
@@ -128,4 +159,7 @@ void main(){
         glfwTerminate()
     }
 
+    fun stop() {
+        forceStopped = true
+    }
 }
