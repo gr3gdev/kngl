@@ -1,8 +1,7 @@
 package com.github.gr3gdev.game
 
 import kotlinx.cinterop.*
-import platform.glew.*
-import platform.glfw.*
+import platform.opengl.*
 
 class Game {
 

@@ -1,0 +1,6 @@
+headers = GLFW/glfw3.h GLFW/glfw3native.h
+staticLibraries = libglfw3.a libgdi32.a glfw3.dll
+package = glfw
+libraryPaths = C:\\mingw64\\x86_64-w64-mingw32\\lib C:\\mingw64\\x86_64-w64-mingw32\\bin
+linkerOpts = -LC:\\mingw64\\x86_64-w64-mingw32\\lib -LC:\\mingw64\\x86_64-w64-mingw32\\bin -lgdi32 -lopengl32 -lglfw3
+compilerOpts = -IC:\\mingw64\\x86_64-w64-mingw32\\include

@@ -7,7 +7,7 @@ plugins {
 group = "com.github.gr3gdev"
 version = "1.0-SNAPSHOT"
 
-val korimVersion = "2.2.0"
+val userHome = File(System.getenv("USERPROFILE") ?: "")
 
 repositories {
     mavenCentral()
@@ -22,38 +22,38 @@ kotlin {
         isMingwX64 -> mingwX64("nativeMingw")
         else -> throw GradleException("Host OS is not supported in Kotlin/Native.")
     }
+    val defDir = when {
+        isMingwX64 -> "src/nativeInterop/cinterop/windows"
+        else -> "src/nativeInterop/cinterop"
+    }
+    val opts = when {
+        isMingwX64 -> listOf(
+            "-L${userHome}\\.konan\\dependencies\\msys2-mingw-w64-x86_64-2\\x86_64-w64-mingw32\\lib",
+            "-L${project.rootDir}"
+        )
+        else -> emptyList()
+    }
     nativeTarget.apply {
         compilations.getByName("main") {
             cinterops {
                 val glew by creating {
-                    if (isMingwX64) {
-                        defFile(project.file("src/nativeInterop/cinterop/glew-windows.def"))
-                    } else {
-                        defFile(project.file("src/nativeInterop/cinterop/glew.def"))
-                    }
+                    defFile(project.file("$defDir/glew.def"))
                 }
                 val glfw by creating {
-                    if (isMingwX64) {
-                        defFile(project.file("src/nativeInterop/cinterop/glfw-windows.def"))
-                    } else {
-                        defFile(project.file("src/nativeInterop/cinterop/glfw.def"))
-                    }
+                    defFile(project.file("$defDir/glfw.def"))
                 }
             }
         }
         binaries {
             executable {
                 entryPoint = "com.github.gr3gdev.main"
+                linkerOpts(opts)
             }
         }
     }
     sourceSets {
         val commonMain by getting
-        val commonTest by getting {
-            dependencies {
-                implementation("com.soywiz.korlibs.korim:korim:$korimVersion")
-            }
-        }
+        val commonTest by getting
     }
 }
 
@@ -73,29 +73,67 @@ tasks {
     register("installGLFWForWindows") {
         doFirst {
             download(
-                "https://github.com/glfw/glfw/releases/download/$glfwVersion/glfw-$glfwVersion.bin.WIN64.zip",
+                "https://github.com/glfw/glfw/releases/download/$glfwVersion/glfw-$glfwVersion.zip",
                 project.file("build/glfwWindows.zip")
             )
         }
         doLast {
-            unzipTo(project.file("lib"), project.file("build/glfwWindows.zip"))
+            unzipTo(project.file("build"), project.file("build/glfwWindows.zip"))
+        }
+    }
+
+    register("installGLFWBinariesForWindows") {
+        doFirst {
+            download(
+                "https://github.com/glfw/glfw/releases/download/$glfwVersion/glfw-$glfwVersion.bin.WIN64.zip",
+                project.file("build/glfwBinWindows.zip")
+            )
+        }
+        doLast {
+            unzipTo(project.file("build"), project.file("build/glfwBinWindows.zip"))
+            copy {
+                from(project.file("build/glfw-$glfwVersion.bin.WIN64/lib-mingw-w64/glfw3.dll"))
+                into("C:\\mingw64\\x86_64-w64-mingw32\\bin")
+            }
         }
     }
 
     register("installGLEWForWindows") {
         doFirst {
             download(
-                "https://freefr.dl.sourceforge.net/project/glew/glew/$glewVersion/glew-$glewVersion-win32.zip",
+                "https://freefr.dl.sourceforge.net/project/glew/glew/$glewVersion/glew-$glewVersion.zip",
                 project.file("build/glewWindows.zip")
             )
         }
         doLast {
-            unzipTo(project.file("lib"), project.file("build/glewWindows.zip"))
+            unzipTo(project.file("build"), project.file("build/glewWindows.zip"))
         }
     }
 
-    register("initOpenGL") {
+    register("initOpenGLForWindows") {
+        doFirst {
+            println("Required : MinGW-w64 and CMake for Windows")
+        }
         dependsOn("installGLFWForWindows")
         dependsOn("installGLEWForWindows")
+        doLast {
+            exec {
+                workingDir(project.file("build/glew-$glewVersion/build/cmake"))
+                commandLine(project.file("glew-windows.cmd").absolutePath)
+            }
+            exec {
+                workingDir(project.file("build/glfw-$glfwVersion"))
+                commandLine(project.file("glfw-windows.cmd").absolutePath)
+            }
+        }
+    }
+
+    register("copyDlls", Copy::class) {
+        dependsOn("installGLFWBinariesForWindows")
+        from("C:\\mingw64\\x86_64-w64-mingw32\\bin") {
+            include("glew32.dll")
+            include("glfw3.dll")
+        }
+        into("build\\bin\\nativeMingw\\releaseExecutable")
     }
 }
