@@ -1,8 +1,8 @@
 package com.github.gr3gdev.game
 
-import kotlinx.cinterop.*
 import glew.*
 import glfw.*
+import kotlinx.cinterop.*
 
 class Game {
 
@@ -15,11 +15,11 @@ class Game {
         glfwWindowHint(GL_SAMPLES, 4)
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3)
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3)
-        glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE)
+        glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE)
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE)
     }
 
-    private fun compileShaderProgram(vertexShader: String, fragmentShader: String): GLuint = memScoped {
+    private fun compileShaderProgram(vertexShader: String, fragmentShader: String): glew.GLuint = memScoped {
         val vsId = glCreateShader!!(GL_VERTEX_SHADER.toUInt())
         val fsId = glCreateShader!!(GL_FRAGMENT_SHADER.toUInt())
 
@@ -95,7 +95,7 @@ void main()
             throw Error("Failed to initialize GLEW")
         }
 
-        glViewport(0, 0, width, height)
+        glfw.glViewport(0, 0, width, height)
 
         val vao = memScoped {
             val output = alloc<UIntVar>()
@@ -133,8 +133,8 @@ void main()
                 GLFW_KEY_ESCAPE
             ) != GLFW_PRESS && glfwWindowShouldClose(window) == 0 && !forceStopped
         ) {
-            glClear(GL_COLOR_BUFFER_BIT.toUInt() or GL_DEPTH_BUFFER_BIT.toUInt())
-            glClearColor(0f, 0f, 0f, 1f)
+            glew.glClear(glew.GL_COLOR_BUFFER_BIT.toUInt() or glew.GL_DEPTH_BUFFER_BIT.toUInt())
+            glew.glClearColor(0f, 0f, 0f, 1f)
 
             glUseProgram!!(pId)
 
@@ -143,13 +143,13 @@ void main()
             glVertexAttribPointer!!(
                 0U,
                 3,
-                GL_FLOAT.toUInt(),
+                glew.GL_FLOAT.toUInt(),
                 false.toByte().toUByte(),
                 0,
                 0L.toCPointer()
             )
 
-            glDrawArrays(GL_TRIANGLES.toUInt(), 0, 3)
+            glew.glDrawArrays(glew.GL_TRIANGLES.toUInt(), 0, 3)
             glDisableVertexAttribArray!!(0U)
 
             glfwSwapBuffers(window)

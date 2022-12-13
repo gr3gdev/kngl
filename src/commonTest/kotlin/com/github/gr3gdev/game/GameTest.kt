@@ -1,21 +1,8 @@
 package com.github.gr3gdev.game
 
-import kotlinx.cinterop.memScoped
-import kotlinx.cinterop.toCValues
-import platform.glew.GL_RGB
-import platform.glew.GL_UNSIGNED_BYTE
-import platform.glew.glReadPixels
 import kotlin.test.Test
 
 class GameTest {
-
-    private fun screenshot() = memScoped {
-        val width = 400
-        val height = 300
-        val pixels = ByteArray(3 * width * height)
-        glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, pixels.toCValues())
-        // TODO PNG.writeImage(imageData, )
-    }
 
     @Test
     fun testTriangle() {
