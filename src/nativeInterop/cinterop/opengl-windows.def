@@ -1,7 +1,0 @@
-headers = GL\\glew.h GL\\wglew.h GLFW\\glfw3.h GLFW\\glfw3native.h
-package = platform.opengl
-
-compilerOpts = -IC:\\mingw64\\x86_64-w64-mingw32\\include
-staticLibraries = libglew32.a glew32.dll libglfw3.a
-libraryPaths = C:\\mingw64\\x86_64-w64-mingw32\\lib C:\\mingw64\\x86_64-w64-mingw32\\bin
-linkerOpts = -LC:\\mingw64\\x86_64-w64-mingw32\\lib -LC:\\mingw64\\x86_64-w64-mingw32\\bin -lopengl32 -lglew32 -lglfw3

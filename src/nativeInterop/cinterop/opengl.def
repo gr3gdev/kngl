@@ -1,9 +1,0 @@
-headers = GL/glew.h GLFW/glfw3.h GLFW/glfw3native.h
-headerFilter = GL/* GLFW/*
-package = platform.opengl
-
-compilerOpts.osx = -I/usr/include -I/usr/local/include
-linkerOpts.osx = -L/usr/lib -L/usr/local/lib -lGL -lGLEW -lglfw
-
-compilerOpts.linux = -I/usr/include -I/usr/local/include
-linkerOpts.linux = -L/usr/lib/x86_64-linux-gnu -lGL -lGLEW -lglfw
