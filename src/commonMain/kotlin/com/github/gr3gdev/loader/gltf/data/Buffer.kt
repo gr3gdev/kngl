@@ -1,4 +1,4 @@
-package com.github.gr3gdev.loader.gltf.objects
+package com.github.gr3gdev.loader.gltf.data
 
 import kotlinx.serialization.Serializable
 
@@ -9,10 +9,4 @@ data class Buffer(
     val name: String? = null,
     val extensions: Extension? = null,
     val extras: Extras? = null
-) {
-    init {
-        if (uri != null) {
-            // TODO: read ".bin" file (application/octet-stream or application/gltf-buffer ?)
-        }
-    }
-}
+)

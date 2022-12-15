@@ -1,4 +1,4 @@
-package com.github.gr3gdev.loader.gltf.objects
+package com.github.gr3gdev.loader.gltf.data
 
 import kotlinx.serialization.Serializable
 

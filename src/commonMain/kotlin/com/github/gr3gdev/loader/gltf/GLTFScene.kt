@@ -1,6 +1,7 @@
 package com.github.gr3gdev.loader.gltf
 
-import com.github.gr3gdev.loader.gltf.objects.*
+import com.github.gr3gdev.loader.gltf.data.*
+import com.github.gr3gdev.loader.util.Files
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -18,4 +19,22 @@ class GLTFScene(
     val scene: Int,
     val scenes: Array<Scene>,
     val textures: Array<Texture>
-)
+) {
+    /**
+     * Load Buffers and Images.
+     */
+    fun load(directory: String) {
+        // TODO: load Buffers ".bin" file (application/octet-stream)
+        buffers
+            .filter { it.uri != null }
+            .forEach { buffer ->
+                println("BUFFER : " + Files.readByteBuffer("$directory/${buffer.uri}", buffer.byteLength))
+            }
+        // TODO: load Images (image/png or image/jpeg)
+        images
+            .filter { it.uri != null }
+            .forEach { image ->
+                println("IMAGE : $directory/${image.uri}")
+            }
+    }
+}

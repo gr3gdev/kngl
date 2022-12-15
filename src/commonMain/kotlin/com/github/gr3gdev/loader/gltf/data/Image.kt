@@ -1,4 +1,4 @@
-package com.github.gr3gdev.loader.gltf.objects
+package com.github.gr3gdev.loader.gltf.data
 
 import kotlinx.serialization.Serializable
 
@@ -10,10 +10,4 @@ data class Image(
     val name: String ? = null,
     val extensions: Extension ? = null,
     val extras: Extras? = null
-) {
-    init {
-        if (uri != null) {
-            // TODO: load image (image/png or image/jpeg)
-        }
-    }
-}
+)
