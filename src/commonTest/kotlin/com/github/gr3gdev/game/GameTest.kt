@@ -6,7 +6,7 @@ class GameTest {
 
     @Test
     fun testTriangle() {
-        val game = Game()
+        val game = Game("Test")
         game.start(
             """#version 410 core
 layout(location = 0) in vec3 vertexPosition_modelspace;

@@ -1,7 +1,8 @@
 import org.gradle.kotlin.dsl.support.unzipTo
 
 plugins {
-    kotlin("multiplatform") version "1.7.20"
+    kotlin("multiplatform") version "1.7.21"
+    kotlin("plugin.serialization") version "1.7.21"
 }
 
 group = "com.github.gr3gdev"
@@ -18,7 +19,7 @@ kotlin {
     val isMingwX64 = hostOs.startsWith("Windows")
     val nativeTarget = when {
         hostOs == "Mac OS X" -> macosX64("nativeOSX")
-        hostOs == "Linux" -> linuxX64("nativeLinuw")
+        hostOs == "Linux" -> linuxX64("nativeLinux")
         isMingwX64 -> mingwX64("nativeMingw")
         else -> throw GradleException("Host OS is not supported in Kotlin/Native.")
     }
@@ -52,7 +53,11 @@ kotlin {
         }
     }
     sourceSets {
-        val commonMain by getting
+        val commonMain by getting {
+            dependencies {
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
+            }
+        }
         val commonTest by getting
     }
 }
