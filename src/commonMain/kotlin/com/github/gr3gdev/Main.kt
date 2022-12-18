@@ -1,9 +1,11 @@
 package com.github.gr3gdev
 
 import com.github.gr3gdev.game.Game
-import glew.GLcharVar
-import kotlinx.cinterop.*
+import com.github.gr3gdev.game.Renderer
+import com.github.gr3gdev.game.rendered.impl.Cube
 
 fun main() {
-    Game("Test").start()
+    val cubeRenderer = Renderer()
+    cubeRenderer.add(Cube())
+    Game("Test", cubeRenderer).start()
 }
