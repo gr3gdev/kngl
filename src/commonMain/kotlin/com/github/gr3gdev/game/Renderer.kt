@@ -1,7 +1,6 @@
 package com.github.gr3gdev.game
 
 import com.github.gr3gdev.game.rendered.RenderObject
-import glew.GLuint
 
 open class Renderer {
 
@@ -11,9 +10,9 @@ open class Renderer {
         objects.add(obj)
     }
 
-    fun init(pid: GLuint) {
+    fun init() {
         objects.forEach {
-            it.create(pid)
+            it.create()
         }
     }
 

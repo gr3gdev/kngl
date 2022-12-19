@@ -2,10 +2,8 @@ package com.github.gr3gdev.window
 
 import glfw.*
 
-class Window(private val title: String, internal val width: Int, internal val height: Int) {
+abstract class Window(private val title: String, internal val width: Int, internal val height: Int) {
 
-    private var initRender: (Unit.() -> Any)? = null
-    private var renderLoop: (Unit.() -> Any)? = null
     private var forceStopped = false
 
     init {
@@ -23,29 +21,28 @@ class Window(private val title: String, internal val width: Int, internal val he
         forceStopped = true
     }
 
-    fun init(init:  Unit.() -> Any) {
-        initRender = init
-    }
+    abstract fun initRender()
 
-    fun render(loop: Unit.() -> Any) {
-        renderLoop = loop
-    }
+    abstract fun renderLoop()
+
+    abstract fun dispose()
 
     fun open() {
         val window = glfwCreateWindow(width, height, title, null, null)
             ?: throw Error("Failed to open GLFW window. If you have an Intel GPU, they are not 3.3 compatible.")
         glfwMakeContextCurrent(window)
         glfwSetInputMode(window, GLFW_STICKY_KEYS, GLFW_TRUE)
-        initRender
+        initRender()
         while (glfwGetKey(
                 window,
                 GLFW_KEY_ESCAPE
             ) != GLFW_PRESS && glfwWindowShouldClose(window) == 0 && !forceStopped
         ) {
-            renderLoop
+            renderLoop()
             glfwSwapBuffers(window)
             glfwPollEvents()
         }
+        dispose()
         glfwTerminate()
     }
 

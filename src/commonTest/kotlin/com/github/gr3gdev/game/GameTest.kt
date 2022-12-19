@@ -9,8 +9,8 @@ class GameTest {
     fun test() {
         val renderer = Renderer()
         renderer.add(Triangle())
-        val game = Game("Test", renderer)
-        game.start(
+        val game = Game(
+            "Test", renderer,
             """#version 410 core
 layout(location = 0) in vec3 vertexPosition_modelspace;
 void main() {
@@ -24,6 +24,7 @@ void main(){
 }
 """
         )
-        game.stop()
+        game.open()
+        //val game = GameBis()
     }
 }
