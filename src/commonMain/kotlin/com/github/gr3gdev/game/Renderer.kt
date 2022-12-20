@@ -1,29 +1,29 @@
 package com.github.gr3gdev.game
 
-import com.github.gr3gdev.game.rendered.RenderObject
+import com.github.gr3gdev.game.rendered.Renderable
 
 open class Renderer {
 
-    private val objects = arrayListOf<RenderObject>()
+    private val renderables = arrayListOf<Renderable>()
 
-    fun add(obj: RenderObject) {
-        objects.add(obj)
+    fun add(obj: Renderable) {
+        renderables.add(obj)
     }
 
-    fun init() {
-        objects.forEach {
-            it.create()
+    fun init(pid: UInt) {
+        renderables.forEach {
+            it.create(pid)
         }
     }
 
     fun render() {
-        objects.forEach {
+        renderables.forEach {
             it.render()
         }
     }
 
     fun dispose() {
-        objects.forEach {
+        renderables.forEach {
             it.dispose()
         }
     }

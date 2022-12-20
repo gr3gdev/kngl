@@ -1,12 +1,12 @@
 package com.github.gr3gdev.game.rendered.impl
 
-import com.github.gr3gdev.game.rendered.RenderObject
+import com.github.gr3gdev.game.rendered.Renderable
 
-class Triangle : RenderObject(
+class Triangle : Renderable(
     floatArrayOf(
-        -0.8f, -0.8f, 0.0f,
-        0.8f, -0.8f, 0.0f,
-        0.0f, 0.8f, 0.0f
+        -1f, -1f, 0f, 1f, 1f, 1f, 1f,
+        1f, -1f, 0f, 1f, 1f, 1f, 1f,
+        0f, 1f, 0f, 1f, 1f, 1f, 1f
     ),
     intArrayOf(0)
 )

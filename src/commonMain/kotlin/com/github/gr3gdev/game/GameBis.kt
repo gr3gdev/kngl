@@ -95,7 +95,7 @@ void main()
             throw Error("Failed to initialize GLEW")
         }
 
-        glViewport(0, 0, width, height)
+        glew.glViewport(0, 0, width, height)
 
         val vao = memScoped {
             val output = alloc<UIntVar>()

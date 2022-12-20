@@ -1,8 +1,8 @@
 package com.github.gr3gdev.game.rendered.impl
 
-import com.github.gr3gdev.game.rendered.RenderObject
+import com.github.gr3gdev.game.rendered.Renderable
 
-class Cube : RenderObject(
+class Cube : Renderable(
     floatArrayOf(
         1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f,    //0
         -1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f,   //1

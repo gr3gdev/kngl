@@ -44,7 +44,7 @@ class Game(
 ) :
     Window(title, 400, 300) {
 
-    private var pid: GLuint = 0U
+    private var pid: UInt = 0U
 
     override fun initRender() {
         if (glewInit() != 0u) {
@@ -56,7 +56,7 @@ class Game(
         glCullFace(GL_BACK)
         glViewport(0, 0, width, height)
         pid = Shaders.compileShaderProgram(vertexShader, fragmentShader)
-        renderer.init()
+        renderer.init(pid)
     }
 
     override fun renderLoop() {
