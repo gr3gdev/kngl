@@ -6,33 +6,41 @@ import glew.*
 import kotlinx.cinterop.invoke
 
 const val DEFAULT_VERTEX_SHARED = """
-#version 430
+attribute vec4 a_position;
+attribute vec4 a_color;
+attribute vec2 a_texCoord;
 
-in vec3 VertexPosition;
-in vec3 VertexColor;
+uniform mat4 u_projTrans;
 
-out vec3 VFragColor;
-
-uniform mat4 MVP;
+varying vec4 v_color;
+varying vec2 v_texCoords;
 
 void main()
 {
-VFragColor= VertexColor;
-vec4 v= vec4(VertexPosition, 1);
-gl_Position= MVP * v;
+    v_color = a_color;
+    v_color.a = v_color.a * (256.0/255.0);
+    v_texCoords = a_texCoord + 0;
+    gl_Position =  u_projTrans * a_position;
 }
 """
 
 const val DEFAULT_FRAGMENT_SHARED = """
-#version 430
+#ifdef GL_ES
+#define LOWP lowp
+    precision mediump float;
+#else
+    #define LOWP
+#endif
 
-in vec3 VFragColor;
+varying LOWP vec4 v_color;
+varying vec2 v_texCoords;
 
-out vec4 FragColor;
+uniform sampler2D u_texture;
 
 void main()
 {
-FragColor = vec4(VFragColor, 1.0);
+    #gl_FragColor = v_color * texture2D(u_texture, v_texCoords);
+    gl_FragColor = vec3(1,0,0);
 }
 """
 

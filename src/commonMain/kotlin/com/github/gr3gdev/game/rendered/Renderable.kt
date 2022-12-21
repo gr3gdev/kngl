@@ -3,6 +3,10 @@ package com.github.gr3gdev.game.rendered
 import glew.*
 import kotlinx.cinterop.*
 
+fun String.toGLcharVar(): CPointer<GLcharVar> = memScoped {
+    return cstr.ptr
+}
+
 abstract class Renderable(
     private val vertexAttributes: FloatArray,
     private val indices: IntArray
@@ -10,6 +14,7 @@ abstract class Renderable(
 
     private var vertexAttributeIndex: UInt = 0U
     private var colorAttributeIndex: UInt = 1U
+    private var textureCoordAttributeIndex: UInt = 2U
 
     private var vao: UInt = 0U
     private var vbo: UInt = 0U
@@ -62,41 +67,34 @@ abstract class Renderable(
         }
 
         // position attribute
-        glVertexAttribPointer!!(
-            vertexAttributeIndex,
-            3,
-            GL_FLOAT.toUInt(),
-            false.toByte().toUByte(),
-            (8 * sizeOf<FloatVar>()).toInt(),
-            0L.toCPointer()
-        )
-        glEnableVertexAttribArray!!(vertexAttributeIndex)
+        enableVertexAttribArray(vertexAttributeIndex, 3, 0L)
 
         // color attribute
-        val colorStartPosition: Long = 6 * sizeOf<FloatVar>()
-        glVertexAttribPointer!!(
-            colorAttributeIndex,
-            3,
-            GL_FLOAT.toUInt(),
-            false.toByte().toUByte(),
-            (8 * sizeOf<FloatVar>()).toInt(),
-            colorStartPosition.toCPointer<COpaque>()
-        )
-        glEnableVertexAttribArray!!(colorAttributeIndex)
+        val colorStartPosition: Long = 3 * sizeOf<FloatVar>()
+        enableVertexAttribArray(colorAttributeIndex, 4, colorStartPosition)
 
         // texture coord attribute
+        val textureStartPosition: Long = 7 * sizeOf<FloatVar>()
+        enableVertexAttribArray(textureCoordAttributeIndex, 2, textureStartPosition)
+
+        // TODO Load textures
         /*
-        val textureStartPosition: Long = 6 * FloatVar.size
+        glUseProgram!!(pid)
+        glUniform1i!!(glGetUniformLocation!!(pid, "".toGLcharVar()), 0)
+        glUseProgram!!(0U)
+         */
+    }
+
+    private fun enableVertexAttribArray(index: UInt, size: Int, startPosition: Long) {
         glVertexAttribPointer!!(
-            textureCoordAttributeIndex,
-            2,
+            index,
+            size,
             GL_FLOAT.toUInt(),
             false.toByte().toUByte(),
-            (8 * sizeOf<FloatVar>()).toInt(),
-            textureStartPosition.toCPointer<COpaque>()
+            (9 * sizeOf<FloatVar>()).toInt(),
+            startPosition.toCPointer()
         )
-        glEnableVertexAttribArray!!(textureCoordAttributeIndex)
-         */
+        glEnableVertexAttribArray!!(index)
     }
 
     fun render() {
