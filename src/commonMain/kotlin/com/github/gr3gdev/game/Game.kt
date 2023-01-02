@@ -5,50 +5,40 @@ import com.github.gr3gdev.window.Window
 import glew.*
 import kotlinx.cinterop.invoke
 
-const val DEFAULT_VERTEX_SHARED = """
-attribute vec4 a_position;
-attribute vec4 a_color;
-attribute vec2 a_texCoord;
+const val VERTEX_SHADER = """
+#version 330 core
+layout(location = 0) in vec3 a_position;
+layout(location = 1) in vec4 a_color;
+layout(location = 2) in vec2 a_texCoord;
 
-uniform mat4 u_projTrans;
+uniform mat4 MVP;
 
-varying vec4 v_color;
-varying vec2 v_texCoords;
+out vec4 fragmentColor;
 
 void main()
 {
-    v_color = a_color;
-    v_color.a = v_color.a * (256.0/255.0);
-    v_texCoords = a_texCoord + 0;
-    gl_Position =  u_projTrans * a_position;
+    gl_Position = MVP * vec4(a_position, 1);
+    fragmentColor = a_color;
+    fragmentColor.a = v_color.a * (256.0/255.0);
 }
 """
 
-const val DEFAULT_FRAGMENT_SHARED = """
-#ifdef GL_ES
-#define LOWP lowp
-    precision mediump float;
-#else
-    #define LOWP
-#endif
+const val FRAGMENT_SHADER = """
+#version 330 core
+in vec4 fragmentColor;
 
-varying LOWP vec4 v_color;
-varying vec2 v_texCoords;
-
-uniform sampler2D u_texture;
+out vec4 gl_color;
 
 void main()
 {
-    #gl_FragColor = v_color * texture2D(u_texture, v_texCoords);
-    gl_FragColor = vec3(1,0,0);
+    #gl_color = fragmentColor;
+    gl_color = vec3(1,0,0);
 }
 """
 
 class Game(
     title: String,
-    private val renderer: Renderer,
-    private val vertexShader: String = DEFAULT_VERTEX_SHARED,
-    private val fragmentShader: String = DEFAULT_FRAGMENT_SHARED
+    private val renderer: Renderer
 ) :
     Window(title, 400, 300) {
 
@@ -63,7 +53,7 @@ class Game(
         glDisable(GL_CULL_FACE)
         glCullFace(GL_BACK)
         glViewport(0, 0, width, height)
-        pid = Shaders.compileShaderProgram(vertexShader, fragmentShader)
+        pid = Shaders.compileShaderProgram(VERTEX_SHADER, FRAGMENT_SHADER)
         renderer.init(pid)
     }
 
@@ -76,6 +66,7 @@ class Game(
 
     override fun dispose() {
         renderer.dispose()
+        glDeleteProgram!!(pid)
     }
 
 }

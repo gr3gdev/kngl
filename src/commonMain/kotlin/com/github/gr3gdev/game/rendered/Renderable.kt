@@ -1,10 +1,17 @@
 package com.github.gr3gdev.game.rendered
 
+import com.github.gr3gdev.game.bean.Matrix4
+import com.github.gr3gdev.game.bean.Vector3
 import glew.*
 import kotlinx.cinterop.*
+import kotlin.math.PI
 
 fun String.toGLcharVar(): CPointer<GLcharVar> = memScoped {
     return cstr.ptr
+}
+
+fun Float.toRadians(): Float {
+    return this * PI.toFloat() / 180
 }
 
 abstract class Renderable(
@@ -15,6 +22,14 @@ abstract class Renderable(
     private var vertexAttributeIndex: UInt = 0U
     private var colorAttributeIndex: UInt = 1U
     private var textureCoordAttributeIndex: UInt = 2U
+
+    private var matricesAttributeIndex: Int = 0
+    private var matrices = floatArrayOf(
+        0f, 0f, 0f, 0f,
+        0f, 0f, 0f, 0f,
+        0f, 0f, 0f, 0f,
+        0f, 0f, 0f, 0f
+    )
 
     private var vao: UInt = 0U
     private var vbo: UInt = 0U
@@ -39,6 +54,17 @@ abstract class Renderable(
     fun create(pid: UInt) {
         //vertexAttributeIndex = glGetAttribLocation!!(pid, "VertexPosition")
         //colorAttributeIndex = glGetAttribLocation!!(pid, "VertexColor")
+        matricesAttributeIndex = glGetAttribLocation!!(pid, "MVP".toGLcharVar())
+
+        val projection = Matrix4.projection(45f.toRadians(), 4f / 3f, 0.1f, 100f)
+        val view = Matrix4.lookAt(
+            Vector3(4f, 3f, 3f),
+            Vector3(0f, 0f, 0f),
+            Vector3(0f, 1f, 0f)
+        )
+        val model = Matrix4.identity
+        val mvp = projection * view * model
+        matrices = mvp.values
 
         vao = genVertexArrays()
         vbo = genBuffers()
@@ -73,11 +99,12 @@ abstract class Renderable(
         val colorStartPosition: Long = 3 * sizeOf<FloatVar>()
         enableVertexAttribArray(colorAttributeIndex, 4, colorStartPosition)
 
-        // texture coord attribute
-        val textureStartPosition: Long = 7 * sizeOf<FloatVar>()
-        enableVertexAttribArray(textureCoordAttributeIndex, 2, textureStartPosition)
-
         // TODO Load textures
+
+        // texture coord attribute
+        //val textureStartPosition: Long = 7 * sizeOf<FloatVar>()
+        //enableVertexAttribArray(textureCoordAttributeIndex, 2, textureStartPosition)
+
         /*
         glUseProgram!!(pid)
         glUniform1i!!(glGetUniformLocation!!(pid, "".toGLcharVar()), 0)
@@ -98,8 +125,14 @@ abstract class Renderable(
     }
 
     fun render() {
-        // glUniformMatrix4fv(matrixID, 1, false, mvp.values)
-
+        matrices.usePinned {
+            glUniformMatrix4fv!!(
+                matricesAttributeIndex,
+                1,
+                false.toByte().toUByte(),
+                it.addressOf(0)
+            )
+        }
         glBindVertexArray!!(vao)
         glDrawElements(
             GL_TRIANGLES.toUInt(),
